@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Forja dos Anéis: O Chamado</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Lora:ital,wght@0,400;0,700;1,400&display=swap');
+
+        :root {
+            --gold: #d4af37;
+            --dark-bg: #0d0d0d;
+            --panel-bg: #1a1a1a;
+            --text-light: #e0e0e0;
+            --accent: #8b0000;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+            font-family: 'Lora', serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-image: radial-gradient(circle at center, #2a2a2a 0%, #000000 100%);
+        }
+
+        .container {
+            max-width: 800px;
+            width: 90%;
+            background: var(--panel-bg);
+            padding: 40px;
+            border: 2px solid var(--gold);
+            border-radius: 10px;
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.15);
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        h1, h2 {
+            font-family: 'Cinzel', serif;
+            color: var(--gold);
+            margin-bottom: 20px;
+        }
+
+        h1 { font-size: 2.5em; text-shadow: 0 0 10px rgba(212, 175, 55, 0.5); }
+        h2 { font-size: 1.5em; line-height: 1.4; color: #fff;}
+
+        p { font-size: 1.2em; line-height: 1.8; }
+
+        .lore-poem {
+            font-style: italic;
+            color: #b0b0b0;
+            margin-bottom: 30px;
+            font-family: 'Cinzel', serif;
+            font-size: 1.1em;
+            border-left: 2px solid var(--gold);
+            border-right: 2px solid var(--gold);
+            padding: 0 20px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #333;
+            border-radius: 4px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress {
+            height: 100%;
+            background: var(--gold);
+            width: 0%;
+            transition: width 0.4s ease;
+            box-shadow: 0 0 10px var(--gold);
+        }
+
+        .options-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .option-btn {
+            background: transparent;
+            color: var(--text-light);
+            border: 1px solid #444;
+            padding: 18px 20px;
+            font-size: 1.1em;
+            font-family: 'Lora', serif;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .option-btn:hover {
+            border-color: var(--gold);
+            background: rgba(212, 175, 55, 0.1);
+            color: #fff;
+            transform: translateX(5px);
+        }
+
+        #quiz-screen, #result-screen {
+            display: none;
+        }
+
+        .action-btn {
+            background: var(--gold);
+            color: var(--dark-bg);
+            border: none;
+            padding: 15px 35px;
+            font-size: 1.3em;
+            font-family: 'Cinzel', serif;
+            cursor: pointer;
+            margin-top: 30px;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .action-btn:hover {
+            background: #fff;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+        }
+
+        .epic-text {
+            text-align: justify;
+            margin-top: 20px;
+            color: #ccc;
+        }
+
+        .winner-highlight {
+            font-size: 2em;
+            color: var(--gold);
+            font-family: 'Cinzel', serif;
+            margin: 20px 0;
+            text-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container" id="main-container">
+    
+    <div id="start-screen">
+        <h1>A Forja dos Anéis</h1>
+        <p class="lore-poem">
+            "Três Anéis para os Reis-Elfos sob este céu,<br>
+            Sete para os Senhores-Anões em seus salões de pedra,<br>
+            Nove para os Homens Mortais, fadados ao eterno sono,<br>
+            Um para o Senhor do Escuro em seu escuro trono..."
+        </p>
+        <p class="epic-text" style="text-align: center;">
+            A magia antiga ecoa novamente pela Terra-média. Enquanto o orgulho corrompeu os Homens, a ganância cegou os Anões e o tempo exilou os Elfos, as forças da criação buscam um novo portador. Não adianta tentar enganar o destino: suas respostas instintivas revelarão a verdadeira natureza da sua alma.
+        </p>
+        <button class="action-btn" onclick="beginJourney()">Ouvir o Chamado</button>
+    </div>
+
+    <div id="quiz-screen">
+        <h1 id="quiz-title">O Chamado</h1>
+        <div class="progress-bar"><div class="progress" id="progress"></div></div>
+        <h2 id="question-text">Iniciando...</h2>
+        <div class="options-grid" id="options-container"></div>
+    </div>
+
+    <div id="result-screen">
+        <h2>Seu Destino foi Selado:</h2>
+        <div class="winner-highlight" id="result-title"></div>
+        <div class="epic-text" id="result-description"></div>
+        <button class="action-btn" onclick="restartQuiz()">Forjar Novamente</button>
+    </div>
+
+</div>
+
+<script>
+    let scores = { elf: 0, dwarf: 0, man: 0, one: 0 };
+    let currentStep = 0;
+
+    const questions = [
+        {
+            text: "Você encontra um objeto enigmático de uma era há muito esquecida. O que você faz com ele?",
+            options: [
+                { text: "Deixaria o artefato onde está, pois algumas coisas pertencem ao passado e sua beleza reside em não serem perturbadas.", type: "elf" },
+                { text: "Estudaria sua resistência e utilidade, partindo do princípio de que se algo sobreviveu ao tempo, possui um valor prático imenso.", type: "dwarf" },
+                { text: "Tomaria o objeto para mim, pois descobrir seus segredos pode ser a chave para acelerar meus próprios objetivos e conquistas.", type: "man" },
+                { text: "Desmontaria o mecanismo para entender como funciona, pois o que não compreendo ou domino não tem permissão para existir.", type: "one" }
+            ]
+        },
+        {
+            text: "Um viajante lhe oferece um mapa que promete revelar uma vantagem inestimável. Como você reage?",
+            options: [
+                { text: "Desconfiaria da pressa da oferta, pois o verdadeiro conhecimento requer tempo, observação e não aceita atalhos.", type: "elf" },
+                { text: "Analisaria o custo-benefício da proposta para garantir que os riscos sejam calculados e a recompensa seja sólida.", type: "dwarf" },
+                { text: "Agarraria a oportunidade sem hesitar, pois o tempo é curto e quem não arrisca é rapidamente esquecido pela história.", type: "man" },
+                { text: "Tomaria o mapa para garantir que ele não o ofereça a mais ninguém, pois vantagens só são reais se forem exclusivas.", type: "one" }
+            ]
+        },
+        {
+            text: "Uma crise de magnitude esmagadora se aproxima rapidamente. Qual é a sua estratégia primária?",
+            options: [
+                { text: "Ilaria a ameaça para preservar o que é essencial, mantendo a sanidade e a memória intactas até a tempestade passar.", type: "elf" },
+                { text: "Construiria defesas tão robustas e duradouras que a própria crise se quebraria ao tentar avançar contra meus muros.", type: "dwarf" },
+                { text: "Encararia o problema de frente com ação imediata, transformando o caos em uma oportunidade de provar meu valor.", type: "man" },
+                { text: "Encontraria o núcleo irracional da crise para redirecionar sua força e destruir aqueles que se opõem ao meu caminho.", type: "one" }
+            ]
+        },
+        {
+            text: "Ao final de um dia exaustivo, o que mais assombra seus pensamentos em silêncio?",
+            options: [
+                { text: "A percepção constante de que tudo o que existe, por mais belo que seja, um dia inevitavelmente desaparecerá.", type: "elf" },
+                { text: "A frustração de sentir que o trabalho realizado hoje ainda não é suficiente para garantir uma segurança inabalável.", type: "dwarf" },
+                { text: "O medo contínuo de que a vida está passando rápido demais e meu legado ainda não foi gravado na história.", type: "man" },
+                { text: "A irritação profunda ao perceber o quanto as pessoas ao meu redor são falhas, lentas e desorganizadas.", type: "one" }
+            ]
+        },
+        {
+            text: "Uma obra-prima ancestral foi destruída por acidente. Qual é o seu primeiro pensamento?",
+            options: [
+                { text: "A beleza é frágil e a dor da perda faz parte da experiência necessária para compreender a natureza do mundo.", type: "elf" },
+                { text: "É necessário recuperar cada fragmento, pois a matéria e o esforço investidos originalmente não podem ser desperdiçados.", type: "dwarf" },
+                { text: "Isso é um retrocesso inaceitável que deve ser consertado imediatamente, não importa o custo ou o esforço exigido.", type: "man" },
+                { text: "Se o objeto se quebrou, ele possuía uma falha intrínseca; a próxima versão será forjada sem qualquer erro humano.", type: "one" }
+            ]
+        },
+        {
+            text: "Como você lida com a traição vinda de alguém em quem precisou confiar?",
+            options: [
+                { text: "Me afastaria com distanciamento, pois a mácula na consciência de quem traiu é um castigo muito pior do que qualquer vingança.", type: "elf" },
+                { text: "Registraria a dívida com precisão, pois a confiança é um contrato e sua quebra exige uma compensação na mesma medida.", type: "dwarf" },
+                { text: "Reagiria com indignação pública e punição severa, para deixar claro que ninguém desafia minha autoridade impunemente.", type: "man" },
+                { text: "Não me surpreenderia, pois o erro foi meu ao não controlar os passos e as intenções dessa pessoa desde o princípio.", type: "one" }
+            ]
+        },
+        {
+            text: "O que o conceito de 'Eternidade' desperta na sua essência?",
+            options: [
+                { text: "Significa ser testemunha do fim de todas as eras e de todos aqueles que um dia conheci, um fardo de pura melancolia.", type: "elf" },
+                { text: "É a medida da resistência estrutural; o objetivo de que meu trabalho seja tão bem feito que nunca ceda ao tempo.", type: "dwarf" },
+                { text: "Representa o objetivo final que busco conquistar através de feitos extraordinários que gravem meu nome na memória eterna.", type: "man" },
+                { text: "É o estado de ordem absoluta onde todas as variáveis finalmente obedecem a uma única e perfeita vontade mestre.", type: "one" }
+            ]
+        },
+        {
+            text: "Se você pudesse erradicar apenas uma fraqueza das mentes das pessoas, qual seria?",
+            options: [
+                { text: "A pressa e a incapacidade de contemplar, que levam as pessoas a destruírem as coisas antes mesmo de entendê-las.", type: "elf" },
+                { text: "A ociosidade e a crença de que as coisas se resolvem sozinhas sem a necessidade de método, esforço e sacrifício.", type: "dwarf" },
+                { text: "O medo do fracasso que paralisa a ambição e as impede de arriscar a mediocridade em busca da verdadeira grandeza.", type: "man" },
+                { text: "O livre-arbítrio indisciplinado e o excesso de sentimentos, que geram o caos e estragam qualquer plano eficiente.", type: "one" }
+            ]
+        },
+        {
+            text: "Diante de um espelho que reflete a verdade mais profunda, o que você procuraria ver?",
+            options: [
+                { text: "A essência inalterada da realidade, como ela era antes que o desgaste e a dor do mundo a tivessem ferido.", type: "elf" },
+                { text: "A fundação invisível das coisas, para compreender com exatidão como as engrenagens ocultas da existência operam.", type: "dwarf" },
+                { text: "Um vislumbre claro do meu próprio destino, para ter certeza de que meus sacrifícios e vitórias valerão a pena.", type: "man" },
+                { text: "As vulnerabilidades ocultas nas mentes de todos ao meu redor, para saber exatamente como conduzi-los ao meu propósito.", type: "one" }
+            ]
+        },
+        {
+            text: "O que define um 'santuário' perfeito para você repousar?",
+            options: [
+                { text: "Um refúgio de profunda serenidade onde o tempo parece não avançar e a harmonia com o ambiente é absoluta.", type: "elf" },
+                { text: "Um local impenetrável e seguro, onde estarei cercado pelas fundações e recursos que lutei arduamente para conquistar.", type: "dwarf" },
+                { text: "Uma posição de grande destaque e altitude, de onde posso visualizar claramente tudo o que construí e influenciei.", type: "man" },
+                { text: "Um ambiente onde o silêncio e o controle são totais, livre de interrupções irrelevantes ou variáveis fora do meu comando.", type: "one" }
+            ]
+        }
+    ];
+
+    const tiebreakerOptions = {
+        elf: { text: "Seguiria o anseio de curar o que o caos desfez, mantendo a beleza viva contra a marcha do esquecimento.", type: "elf" },
+        dwarf: { text: "Atenderia à necessidade de não ceder um milímetro de chão, aguentando o peso do mundo através da pura resistência.", type: "dwarf" },
+        man: { text: "Tomaria as rédeas do presente, marchando em direção à tempestade para que meu nome não desapareça na poeira.", type: "man" },
+        one: { text: "Imporia minha vontade para sobrepujar a falha de todas as coisas, moldando a realidade em um padrão perfeito.", type: "one" }
+    };
+
+    const results = {
+        elf: {
+            title: "Os Três Anéis dos Elfos",
+            text: "Narya, Nenya ou Vilya. Sua alma repudia a destruição gratuita e a ânsia material. Você busca a preservação, a memória e a beleza intocada. O anel não lhe dará domínio sobre os outros, mas sim o poder de curar as feridas do mundo e adiar a decadência do tempo. Você compartilha da sabedoria de seres como Galadriel e Elrond. Seu maior desafio será não se perder na melancolia do passado enquanto o presente precisa da sua luz."
+        },
+        dwarf: {
+            title: "Os Sete Anéis dos Senhores Anões",
+            text: "O poder da Terra ressoa em você. Você é inabalável, focado e entende que o verdadeiro legado se constrói com esforço palpável, suor e fundações sólidas. Seu anel multiplicará as riquezas ao seu redor e aguçará suas habilidades. Sua mente é resistente à dominação direta, mas cuidado: a magia do anel inflamará sua cobiça. O excesso de isolamento e a ganância desmedida costumam atrair chamas, ruínas e, ocasionalmente, dragões."
+        },
+        man: {
+            title: "Os Nove Anéis dos Homens",
+            text: "Sua resposta instintiva é a da ação, da ambição e do medo do esquecimento. Você não aceita a insignificância. Os Nove anéis concedem glória, grande poder de liderança e a capacidade de realizar feitos lendários. Contudo, essa sede cega por resultado e por escapar da mortalidade é a sua ruína. O poder lhe dará um império e alongará seus dias, mas lentamente drenará sua essência, até que você se torne um espectro, escravo da própria ambição."
+        },
+        one: {
+            title: "O Um Anel (Senhor do Escuro)",
+            text: "Ash nazg durbatulûk... Você não busca fazer parte da história; você deseja ser a mão que a escreve. Sua mente é clínica, calculista e carece de empatia pelo que é caótico. Você enxerga os outros como ferramentas. Você não apenas portaria o Um Anel, você tem a alma para forjá-lo. Esse poder absoluto garantirá que o mundo se curve à sua perfeita ordem, mas o condenará ao isolamento de uma torre onde você será a única coisa real."
+        }
+    };
+
+    function beginJourney() {
+        document.getElementById('start-screen').style.display = 'none';
+        document.getElementById('quiz-screen').style.display = 'block';
+        startQuiz();
+    }
+
+    function startQuiz() {
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const progress = document.getElementById('progress');
+
+        progress.style.width = `${(currentStep / questions.length) * 100}%`;
+        optionsContainer.innerHTML = '';
+
+        const currentQ = questions[currentStep];
+        questionText.textContent = `${currentStep + 1}. ${currentQ.text}`;
+
+        let shuffledOptions = [...currentQ.options].sort(() => Math.random() - 0.5);
+
+        shuffledOptions.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.textContent = opt.text;
+            btn.onclick = () => selectOption(opt.type);
+            optionsContainer.appendChild(btn);
+        });
+    }
+
+    function selectOption(type) {
+        scores[type]++;
+        currentStep++;
+
+        if (currentStep < questions.length) {
+            startQuiz();
+        } else if (currentStep === questions.length) {
+            checkTie();
+        }
+    }
+
+    function checkTie() {
+        let max = -1;
+        let tied = [];
+        
+        for (let t in scores) {
+            if (scores[t] > max) {
+                max = scores[t];
+                tied = [t];
+            } else if (scores[t] === max) {
+                tied.push(t);
+            }
+        }
+
+        if (tied.length > 1) {
+            triggerTiebreaker(tied);
+        } else {
+            showResult(tied[0]);
+        }
+    }
+
+    function triggerTiebreaker(tiedTypes) {
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const progress = document.getElementById('progress');
+
+        progress.style.width = `100%`; 
+        questionText.innerHTML = "11. <i>O Desempate</i><br>Um último mistério se ergue na neblina do seu destino. Forças iguais disputam sua essência em um impasse absoluto. Diante do abismo, qual chamado instintivo você atende?";
+        optionsContainer.innerHTML = '';
+
+        let optionsToShow = tiedTypes.map(type => tiebreakerOptions[type]);
+        optionsToShow.sort(() => Math.random() - 0.5);
+
+        optionsToShow.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.textContent = opt.text;
+            btn.onclick = () => showResult(opt.type);
+            optionsContainer.appendChild(btn);
+        });
+    }
+
+    function showResult(winner) {
+        document.getElementById('quiz-screen').style.display = 'none';
+        document.getElementById('result-screen').style.display = 'block';
+
+        document.getElementById('result-title').textContent = results[winner].title;
+        document.getElementById('result-description').innerHTML = `<p>${results[winner].text}</p>`;
+    }
+
+    function restartQuiz() {
+        scores = { elf: 0, dwarf: 0, man: 0, one: 0 };
+        currentStep = 0;
+        document.getElementById('result-screen').style.display = 'none';
+        document.getElementById('start-screen').style.display = 'block';
+    }
+</script>
+
+</body>
+</html>
