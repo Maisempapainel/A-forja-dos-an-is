@@ -146,6 +146,24 @@
             margin: 20px 0;
             text-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
         }
+
+        /* Novas regras de estilo para os créditos */
+        .creator-credits {
+            font-family: 'Cinzel', serif;
+            color: var(--gold);
+            font-size: 0.9em;
+            text-align: center;
+            margin-top: 30px;
+            padding: 10px 0;
+            text-shadow: 0 0 5px rgba(212, 175, 55, 0.7);
+            animation: credits-glow 2s ease-in-out infinite alternate;
+            letter-spacing: 1px;
+        }
+
+        @keyframes credits-glow {
+            0% { text-shadow: 0 0 5px rgba(212, 175, 55, 0.7); opacity: 0.8; }
+            100% { text-shadow: 0 0 15px rgba(212, 175, 55, 1); opacity: 1; }
+        }
     </style>
 </head>
 <body>
@@ -161,9 +179,10 @@
             Um para o Senhor do Escuro em seu escuro trono..."
         </p>
         <p class="epic-text" style="text-align: center;">
-            A magia antiga ecoa novamente pela Terra-média. Enquanto o orgulho corrompeu os Homens, a ganância cegou os Anões e o tempo exilou os Elfos, as forças da criação buscam um novo portador. Não adianta tentar enganar o destino: suas respostas instintivas revelarão a verdadeira natureza da sua alma.
+            A magia antiga ecoa novamente pela Terra-média. Enquanto o orgulho corrompeu os Homens, a ganância cegou os Anões e o tempo exilou os Elfos, as forces da criação buscam um novo portador. Não adianta tentar enganar o destino: suas respostas instintivas revelarão a verdadeira natureza da sua alma.
         </p>
         <button class="action-btn" onclick="beginJourney()">Ouvir o Chamado</button>
+        <footer class="creator-credits">Criado por: Cassio Henrique | @zeny_irons</footer>
     </div>
 
     <div id="quiz-screen">
@@ -171,6 +190,7 @@
         <div class="progress-bar"><div class="progress" id="progress"></div></div>
         <h2 id="question-text">Iniciando...</h2>
         <div class="options-grid" id="options-container"></div>
+        <footer class="creator-credits">Criado por: Cassio Henrique | @zeny_irons</footer>
     </div>
 
     <div id="result-screen">
