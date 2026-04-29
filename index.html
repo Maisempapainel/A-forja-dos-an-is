@@ -28,6 +28,55 @@
             background-image: radial-gradient(circle at center, #2a2a2a 0%, #000000 100%);
         }
 
+        /* --- NOVOS ESTILOS: Contadores e Avaliação --- */
+        .site-stats {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 0.8em;
+            color: var(--gold);
+            font-family: 'Cinzel', serif;
+            text-align: left;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 5px 10px;
+            border-radius: 5px;
+            border: 1px solid #444;
+        }
+
+        .star-rating {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            margin-top: 15px;
+            flex-direction: row-reverse;
+        }
+
+        .star-rating input { display: none; }
+
+        .star-rating label {
+            font-size: 2em;
+            color: #444;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .star-rating input:checked ~ label,
+        .star-rating label:hover,
+        .star-rating label:hover ~ label {
+            color: var(--gold);
+            text-shadow: 0 0 10px var(--gold);
+        }
+
+        .global-results-stats {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #333;
+            font-size: 0.9em;
+            color: #aaa;
+            line-height: 1.6;
+        }
+        /* ------------------------------------------- */
+
         .container {
             max-width: 800px;
             width: 90%;
@@ -147,7 +196,6 @@
             text-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
         }
 
-        /* Novas regras de estilo para os créditos */
         .creator-credits {
             font-family: 'Cinzel', serif;
             color: var(--gold);
@@ -167,6 +215,11 @@
     </style>
 </head>
 <body>
+
+<div class="site-stats">
+    Visitas: <span id="visit-count">...</span><br>
+    Nota: <span id="avg-rating">...</span>/5 ★
+</div>
 
 <div class="container" id="main-container">
     
@@ -197,12 +250,93 @@
         <h2>Seu Destino foi Selado:</h2>
         <div class="winner-highlight" id="result-title"></div>
         <div class="epic-text" id="result-description"></div>
+
+        <div class="epic-text" style="text-align: center; margin-top: 30px;">
+            Avalie sua jornada:
+            <div class="star-rating" id="star-rating-container">
+                <input type="radio" id="star5" name="rating" value="5" onclick="submitRating(5)"><label for="star5">★</label>
+                <input type="radio" id="star4" name="rating" value="4" onclick="submitRating(4)"><label for="star4">★</label>
+                <input type="radio" id="star3" name="rating" value="3" onclick="submitRating(3)"><label for="star3">★</label>
+                <input type="radio" id="star2" name="rating" value="2" onclick="submitRating(2)"><label for="star2">★</label>
+                <input type="radio" id="star1" name="rating" value="1" onclick="submitRating(1)"><label for="star1">★</label>
+            </div>
+            <div id="rating-feedback" style="color: var(--gold); font-size: 0.8em; margin-top: 5px;"></div>
+        </div>
+
+        <div class="global-results-stats" id="global-stats-container">
+            Carregando os ecos de outros viajantes...
+        </div>
+
         <button class="action-btn" onclick="restartQuiz()">Forjar Novamente</button>
     </div>
 
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
 <script>
+    // --- CONFIGURAÇÃO DO FIREBASE ---
+    const firebaseConfig = {
+        apiKey: "AIzaSyDWMwsX0THrfAJW_LpGMFhQbqrZUyOtTds",
+        authDomain: "forja-dos-aneis.firebaseapp.com",
+        databaseURL: "https://forja-dos-aneis-default-rtdb.firebaseio.com",
+        projectId: "forja-dos-aneis",
+        storageBucket: "forja-dos-aneis.firebasestorage.app",
+        messagingSenderId: "1089353778791",
+        appId: "1:1089353778791:web:9e104981dcadab3e8bb6c2",
+        measurementId: "G-GWDWX09Q5F"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+    let userIP = "unknown";
+
+    // Pega o IP do usuário para limitar a votação
+    fetch('https://api.ipify.org?format=json')
+        .then(response => response.json())
+        .then(data => { userIP = data.ip.replace(/\./g, '_'); }); 
+
+    // Registra visita e exibe média de notas
+    function initSiteStats() {
+        const visitsRef = database.ref('stats/visits');
+        const ratingsRef = database.ref('ratings');
+
+        // Incrementa visitas
+        visitsRef.transaction(currentVisits => (currentVisits || 0) + 1);
+
+        // Mostra visitas em tempo real
+        visitsRef.on('value', snapshot => {
+            document.getElementById('visit-count').innerText = snapshot.val() || 0;
+        });
+
+        // Calcula média de estrelas
+        ratingsRef.on('value', snapshot => {
+            const data = snapshot.val();
+            if (data) {
+                const ratings = Object.values(data);
+                const sum = ratings.reduce((a, b) => a + b, 0);
+                const avg = (sum / ratings.length).toFixed(1);
+                document.getElementById('avg-rating').innerText = avg;
+            } else {
+                document.getElementById('avg-rating').innerText = "-";
+            }
+        });
+    }
+    initSiteStats();
+
+    // Envia a nota do jogador
+    function submitRating(stars) {
+        if (userIP === "unknown") return; 
+        
+        const specificRatingRef = database.ref('ratings/' + userIP);
+        specificRatingRef.set(stars).then(() => {
+            document.getElementById('rating-feedback').innerText = "Sua marca foi gravada na história.";
+            document.querySelectorAll('input[name="rating"]').forEach(input => input.disabled = true);
+        });
+    }
+
+    // --- LÓGICA DO QUIZ ---
     let scores = { elf: 0, dwarf: 0, man: 0, one: 0 };
     let currentStep = 0;
 
@@ -411,6 +545,29 @@
 
         document.getElementById('result-title').textContent = results[winner].title;
         document.getElementById('result-description').innerHTML = `<p>${results[winner].text}</p>`;
+
+        // Grava o resultado no Firebase e busca estatísticas globais
+        const resultRef = database.ref('stats/results/' + winner);
+        const allResultsRef = database.ref('stats/results');
+
+        resultRef.transaction(current => (current || 0) + 1);
+
+        allResultsRef.once('value', snapshot => {
+            const data = snapshot.val() || {};
+            const elfos = data.elf || 0;
+            const anoes = data.dwarf || 0;
+            const homens = data.man || 0;
+            const umAnel = data.one || 0;
+            const total = elfos + anoes + homens + umAnel;
+
+            document.getElementById('global-stats-container').innerHTML = `
+                <p><strong>Destinos Forjados até agora: ${total}</strong></p>
+                Portadores Élficos: ${elfos} <br>
+                Senhores Anões: ${anoes} <br>
+                Reis dos Homens: ${homens} <br>
+                Senhores do Escuro: ${umAnel}
+            `;
+        });
     }
 
     function restartQuiz() {
